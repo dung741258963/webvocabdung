@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bài tập từ vựng</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: #f8fafc;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div id="exerciseView">
+            <div class="header" style="margin-bottom: 24px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                    <button onclick="location.href='index.html'" 
+                            style="padding: 8px 16px; 
+                                   border-radius: 8px; 
+                                   border: none;
+                                   background: #f5f3ff; 
+                                   color: #7c3aed; 
+                                   font-weight: 600;
+                                   display: flex;
+                                   align-items: center;
+                                   gap: 8px;
+                                   cursor: pointer;
+                                   transition: all 0.3s;"
+                            onmouseover="this.style.background='#ede9fe';
+                                       this.style.transform='translateY(-1px)'"
+                            onmouseout="this.style.background='#f5f3ff';
+                                      this.style.transform='translateY(0)'">
+                        <span style="font-size: 18px;">←</span>
+                        <span>Trang chủ</span>
+                    </button>
+                    <div style="color: #6b7280;">
+                        Câu: <span id="exerciseProgress">1</span>/<span id="exerciseTotal">10</span>
+                    </div>
+                </div>
+                <div style="text-align: center;">
+                    <h2 style="color: #7c3aed; font-size: 24px;">Ôn tập từ vựng</h2>
+                </div>
+            </div>
+
+            <div id="exerciseContent" style="background: white; border-radius: 16px; padding: 32px;
+                                           box-shadow: 0 4px 6px rgba(0,0,0,0.1); text-align: center;">
+                <div style="font-size: 48px; color: #7c3aed; font-weight: bold; margin-bottom: 16px;" 
+                     id="exerciseWord"></div>
+                <div style="color: #6b7280; font-size: 20px; margin-bottom: 32px;" 
+                     id="exercisePhonetic"></div>
+                
+                <div style="max-width: 400px; margin: 0 auto;">
+                    <input type="text" id="answerInput" placeholder="Nhập nghĩa tiếng Việt..."
+                           style="width: 100%; padding: 16px; border: 2px solid #e5e7eb; border-radius: 12px;
+                                  font-size: 18px; outline: none; transition: all 0.3s; margin-bottom: 16px;"
+                           onkeyup="if(event.key === 'Enter') checkAnswer()"
+                           onfocus="this.style.borderColor='#7c3aed';this.style.boxShadow='0 0 0 3px rgba(124,58,237,0.1)'"
+                           onblur="this.style.borderColor='#e5e7eb';this.style.boxShadow='none'">
+                    
+                    <button onclick="checkAnswer()" 
+                            style="width: 100%; padding: 16px; border-radius: 12px; border: none;
+                                   background: #7c3aed; color: white; font-size: 18px; font-weight: 600; 
+                                   cursor: pointer; transition: all 0.3s;"
+                            onmouseover="this.style.background='#6d28d9'"
+                            onmouseout="this.style.background='#7c3aed'">
+                        Kiểm tra
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const vocabList = [
+            { english: "Afford", phonetic: "/əˈfɔːd/", vietnamese: "Đủ khả năng", example: "I can't afford to buy a new phone.(tôi ko đủ khả năng để mua điện thoại mới)", type: "" },
+            { english: "Agree", phonetic: "/əˈɡriː/", vietnamese: "Đồng ý", example: "They agreed to help us.", type: "+ to V" },
+            { english: "Ask", phonetic: "/ɑːsk/", vietnamese: "Xin phép", example: "She asked to leave early.", type: "+ to V" },
+            { english: "Attempt", phonetic: "/əˈtempt/", vietnamese: "Nỗ lực", example: "He attempted to fix the car.", type: "+ to V" },
+            { english: "Choose", phonetic: "/tʃuːz/", vietnamese: "Chọn", example: "We chose to stay home.", type: "+ to V" },
+            { english: "Decide", phonetic: "/dɪˈsaɪd/", vietnamese: "Quyết định", example: "I decided to study abroad.", type: "+ to V" },
+            { english: "Deserve", phonetic: "/dɪˈzɜːv/", vietnamese: "Xứng đáng", example: "You deserve to be happy.", type: "+ to V" },
+            { english: "Determine", phonetic: "/dɪˈtɜːmɪn/", vietnamese: "Quyết định", example: "She determined to succeed.", type: "+ to V" },
+            { english: "Fail", phonetic: "/feɪl/", vietnamese: "Thất bại", example: "He failed to pass the exam.", type: "+ to V" },
+            { english: "Manage", phonetic: "/ˈmænɪdʒ/", vietnamese: "Xoay sở được", example: "I managed to finish on time.", type: "+ to V" },
+            { english: "Tend", phonetic: "/tend/", vietnamese: "Có khuynh hướng", example: "She tends to forget things.", type: "+ to V" },
+            { english: "Offer", phonetic: "/ˈɒfə(r)/", vietnamese: "Đề nghị, mời", example: "They offered to help me.", type: "+ to V" },
+            { english: "Refuse", phonetic: "/rɪˈfjuːz/", vietnamese: "Từ chối", example: "He refused to answer.", type: "+ to V" },
+            { english: "Plan", phonetic: "/plæn/", vietnamese: "Lên kế hoạch", example: "We plan to travel next month.", type: "+ to V" },
+            { english: "Arrange", phonetic: "/əˈreɪndʒ/", vietnamese: "Sắp xếp", example: "I arranged to meet them at 5.", type: "+ to V" },
+            { english: "Hope", phonetic: "/həʊp/", vietnamese: "Hy vọng", example: "I hope to see you soon.", type: "+ to V" },
+            { english: "Forget", phonetic: "/fəˈɡet/", vietnamese: "Quên", example: "Don't forget to call me.", type: "+ to V" },
+            { english: "Promise", phonetic: "/ˈprɒmɪs/", vietnamese: "Hứa", example: "She promised to come.", type: "+ to V" },
+            { english: "Threaten", phonetic: "/ˈθretən/", vietnamese: "Đe dọa", example: "He threatened to quit.", type: "+ to V" },
+            { english: "Learn", phonetic: "/lɜːn/", vietnamese: "Học", example: "I'm learning to play guitar.", type: "+ to V" },
+            { english: "Would like", phonetic: "/wʊd laɪk/", vietnamese: "Muốn", example: "I would like to order pizza.", type: "+ to V" },
+            { english: "Long", phonetic: "/lɒŋ/", vietnamese: "Khao khát", example: "She longs to go home.", type: "+ to V" }
+        ];
+
+        let currentExercise = 0;
+        let exerciseQuestions = [];
+
+        function generateExercise() {
+            exerciseQuestions = [];
+            let words = [...vocabList];
+            // Tạo 10 câu hỏi ngẫu nhiên
+            for(let i = 0; i < 10; i++) {
+                if(words.length === 0) break;
+                const randomIndex = Math.floor(Math.random() * words.length);
+                exerciseQuestions.push(words[randomIndex]);
+                words.splice(randomIndex, 1);
+            }
+            currentExercise = 0;
+            showCurrentExercise();
+        }
+
+        function showCurrentExercise() {
+            if (!exerciseQuestions || currentExercise >= exerciseQuestions.length) {
+                return;
+            }
+            
+            const word = exerciseQuestions[currentExercise];
+            if (!word) return;
+
+            const exerciseWord = document.getElementById('exerciseWord');
+            const exercisePhonetic = document.getElementById('exercisePhonetic');
+            const exerciseProgress = document.getElementById('exerciseProgress');
+            const exerciseTotal = document.getElementById('exerciseTotal');
+            const answerInput = document.getElementById('answerInput');
+            
+            if (exerciseWord) exerciseWord.textContent = word.english;
+            if (exercisePhonetic) exercisePhonetic.textContent = word.phonetic;
+            if (exerciseProgress) exerciseProgress.textContent = currentExercise + 1;
+            if (exerciseTotal) exerciseTotal.textContent = exerciseQuestions.length;
+            if (answerInput) {
+                answerInput.value = '';
+                answerInput.focus();
+            }
+        }
+
+        function checkAnswer() {
+            const answer = document.getElementById('answerInput').value.trim().toLowerCase();
+            const correctAnswer = exerciseQuestions[currentExercise].vietnamese.toLowerCase();
+            
+            // Tách câu trả lời và đáp án thành các từ riêng lẻ để so sánh
+            const answerWords = answer.split(/[,\s]+/).filter(w => w.length > 0);
+            const correctWords = correctAnswer.split(/[,\s]+/).filter(w => w.length > 0);
+            
+            // Kiểm tra xem tất cả các từ trong câu trả lời có trong đáp án không
+            const isCorrect = answerWords.every(word => correctWords.includes(word)) && 
+                            answerWords.length > 0;
+
+            showFeedback(isCorrect);
+            
+            if(isCorrect) {
+                setTimeout(() => {
+                    currentExercise++;
+                    if(currentExercise < exerciseQuestions.length) {
+                        showCurrentExercise();
+                    } else {
+                        showExerciseComplete();
+                    }
+                }, 1000);
+            }
+        }
+
+        function showFeedback(isCorrect) {
+            const existingFeedback = document.getElementById('feedbackMessage');
+            if (existingFeedback) {
+                existingFeedback.remove();
+            }
+
+            const feedback = document.createElement('div');
+            feedback.id = 'feedbackMessage';
+            feedback.style.position = 'fixed';
+            feedback.style.top = '50%';
+            feedback.style.left = '50%';
+            feedback.style.transform = 'translate(-50%, -50%) scale(0.9)';
+            feedback.style.opacity = '0';
+            feedback.style.transition = 'all 0.3s ease-in-out';
+            feedback.style.padding = '24px 40px';
+            feedback.style.background = 'white';
+            feedback.style.borderRadius = '16px';
+            feedback.style.boxShadow = '0 4px 20px rgba(0, 0, 0, 0.15)';
+            feedback.style.zIndex = '1000';
+            feedback.style.textAlign = 'center';
+            
+            // Thêm overlay nền mờ
+            const overlay = document.createElement('div');
+            overlay.style.position = 'fixed';
+            overlay.style.top = '0';
+            overlay.style.left = '0';
+            overlay.style.right = '0';
+            overlay.style.bottom = '0';
+            overlay.style.background = 'rgba(0, 0, 0, 0.2)';
+            overlay.style.backdropFilter = 'blur(4px)';
+            overlay.style.zIndex = '999';
+            overlay.style.opacity = '0';
+            overlay.style.transition = 'opacity 0.3s ease-in-out';
+            
+            if(isCorrect) {
+                const currentWord = exerciseQuestions[currentExercise];
+                feedback.innerHTML = `
+                    <div style="font-size: 40px; margin-bottom: 16px;">✨</div>
+                    <div style="color: #16a34a; font-size: 24px; font-weight: bold; margin-bottom: 8px;">
+                        Chính xác!
+                    </div>
+                    <div style="background: #f0fdf4; padding: 12px 24px; border-radius: 12px; 
+                               display: inline-block; margin-bottom: 16px;">
+                        <div style="color: #16a34a; font-size: 20px; font-weight: bold;">
+                            ${currentWord.vietnamese}
+                        </div>
+                    </div>
+                    <div style="color: #6b7280; font-size: 14px;">
+                        "${currentWord.example}"
+                    </div>
+                `;
+            } else {
+                const currentWord = exerciseQuestions[currentExercise];
+                feedback.innerHTML = `
+                    <div style="font-size: 40px; margin-bottom: 16px;">😅</div>
+                    <div style="color: #dc2626; font-size: 24px; font-weight: bold; margin-bottom: 8px;">
+                        Chưa đúng
+                    </div>
+                    <div style="color: #6b7280; font-size: 16px; margin-bottom: 16px;">
+                        Đáp án đúng là:
+                    </div>
+                    <div style="background: #f3f4f6; padding: 12px 24px; border-radius: 12px; 
+                               display: inline-block; margin-bottom: 16px;">
+                        <div style="color: #374151; font-size: 20px; font-weight: bold;">
+                            ${currentWord.vietnamese}
+                        </div>
+                    </div>
+                    <div style="color: #6b7280; font-size: 14px;">
+                        "${currentWord.example}"
+                    </div>
+                `;
+            }
+            
+            document.body.appendChild(overlay);
+            document.body.appendChild(feedback);
+            
+            // Trigger animation
+            setTimeout(() => {
+                feedback.style.transform = 'translate(-50%, -50%) scale(1)';
+                feedback.style.opacity = '1';
+                overlay.style.opacity = '1';
+            }, 10);
+            
+            const duration = isCorrect ? 1500 : 3000;
+            
+            setTimeout(() => {
+                feedback.style.transform = 'translate(-50%, -50%) scale(0.9)';
+                feedback.style.opacity = '0';
+                overlay.style.opacity = '0';
+                setTimeout(() => {
+                    feedback.remove();
+                    overlay.remove();
+                }, 300);
+            }, duration);
+        }
+
+        function showExerciseComplete() {
+            const exerciseContent = document.getElementById('exerciseContent');
+            const completeHTML = `
+                <div style="text-align: center; padding: 48px;">
+                    <div style="font-size: 64px; margin-bottom: 24px;">🎉</div>
+                    <h2 style="font-size: 32px; color: #7c3aed; margin-bottom: 16px;">
+                        Xuất sắc!
+                    </h2>
+                    <p style="color: #6b7280; margin-bottom: 32px; font-size: 18px;">
+                        Bạn đã hoàn thành xuất sắc bài tập.<br>
+                        Hãy thử thách bản thân với bộ từ vựng mới nhé!
+                    </p>
+                    <div style="display: flex; gap: 16px; justify-content: center;">
+                        <button onclick="generateExercise()"
+                                style="padding: 14px 28px; border-radius: 12px; border: none;
+                                       background: #7c3aed; color: white; font-weight: 600;
+                                       cursor: pointer; transition: all 0.3s; font-size: 16px;
+                                       box-shadow: 0 4px 6px rgba(124, 58, 237, 0.2);"
+                                onmouseover="this.style.background='#6d28d9';
+                                           this.style.transform='translateY(-2px)';
+                                           this.style.boxShadow='0 6px 8px rgba(124, 58, 237, 0.3)'"
+                                onmouseout="this.style.background='#7c3aed';
+                                          this.style.transform='translateY(0)';
+                                          this.style.boxShadow='0 4px 6px rgba(124, 58, 237, 0.2)'">
+                            Làm lại bài tập ↺
+                        </button>
+                    </div>
+                </div>
+            `;
+            exerciseContent.innerHTML = completeHTML;
+        }
+
+        // Initialize
+        generateExercise();
+    </script>
+</body>
+</html>

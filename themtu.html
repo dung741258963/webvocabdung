@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thêm từ vựng mới</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: #f8fafc;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        /* Rich text editor styles */
+        .editor-toolbar {
+            display: flex;
+            gap: 8px;
+            padding: 8px;
+            background: #f3f4f6;
+            border: 1px solid #e5e7eb;
+            border-bottom: none;
+            border-radius: 8px 8px 0 0;
+        }
+
+        .editor-toolbar button {
+            padding: 4px 8px;
+            border: none;
+            background: none;
+            cursor: pointer;
+            font-weight: bold;
+            border-radius: 4px;
+        }
+
+        .editor-toolbar button:hover {
+            background: #e5e7eb;
+        }
+
+        .editor-toolbar .divider {
+            color: #9ca3af;
+            margin: 0 4px;
+        }
+
+        .rich-editor {
+            min-height: 100px;
+            padding: 12px;
+            border: 1px solid #e5e7eb;
+            border-radius: 0 0 8px 8px;
+            outline: none;
+            font-family: inherit;
+            line-height: 1.5;
+            background: white;
+        }
+
+        .rich-editor:empty:before {
+            content: attr(placeholder);
+            color: #9ca3af;
+        }
+
+        .rich-editor:focus {
+            border-color: #7c3aed;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .form-group {
+            margin-bottom: 24px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            color: #4b5563;
+            font-weight: 500;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: all 0.3s;
+            outline: none;
+        }
+
+        .form-input:focus {
+            border-color: #7c3aed;
+            box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1);
+        }
+
+        .word-list {
+            margin-top: 40px;
+            background: white;
+            padding: 24px;
+            border-radius: 16px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .word-item {
+            padding: 16px;
+            border-radius: 8px;
+            background: #f8f7ff;
+            margin-bottom: 16px;
+            transition: all 0.3s;
+        }
+
+        .word-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .word-english {
+            font-size: 24px;
+            color: #7c3aed;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .word-vietnamese {
+            font-size: 18px;
+            color: #374151;
+            margin-bottom: 8px;
+        }
+
+        .word-phonetic {
+            color: #6b7280;
+            font-size: 16px;
+            margin-bottom: 8px;
+        }
+
+        .word-example {
+            font-style: italic;
+            color: #6b7280;
+            font-size: 14px;
+        }
+
+        .success-message {
+            background: #f0fdf4;
+            color: #166534;
+            padding: 16px;
+            border-radius: 8px;
+            margin-bottom: 24px;
+            display: none;
+        }
+
+        .error-message {
+            background: #fef2f2;
+            color: #dc2626;
+            padding: 16px;
+            border-radius: 8px;
+            margin-bottom: 24px;
+            display: none;
+            animation: shake 0.5s;
+        }
+
+        @keyframes shake {
+            0% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            50% { transform: translateX(5px); }
+            75% { transform: translateX(-5px); }
+            100% { transform: translateX(0); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 32px;">
+            <button onclick="location.href='index.html'" 
+                    style="padding: 8px 16px; 
+                           border-radius: 8px; 
+                           border: none;
+                           background: #f5f3ff; 
+                           color: #7c3aed; 
+                           font-weight: 600;
+                           display: flex;
+                           align-items: center;
+                           gap: 8px;
+                           cursor: pointer;
+                           transition: all 0.3s;"
+                    onmouseover="this.style.background='#ede9fe';
+                               this.style.transform='translateY(-1px)'"
+                    onmouseout="this.style.background='#f5f3ff';
+                              this.style.transform='translateY(0)'">
+                <span style="font-size: 18px;">←</span>
+                <span>Trang chủ</span>
+            </button>
+            <button onclick="downloadVocabList()" 
+                    style="padding: 8px 16px; 
+                           border-radius: 8px; 
+                           border: none;
+                           background: #7c3aed; 
+                           color: white; 
+                           font-weight: 600;
+                           display: flex;
+                           align-items: center;
+                           gap: 8px;
+                           cursor: pointer;
+                           transition: all 0.3s;"
+                    onmouseover="this.style.background='#6d28d9';
+                               this.style.transform='translateY(-1px)'"
+                    onmouseout="this.style.background='#7c3aed';
+                              this.style.transform='translateY(0)'">
+                <span>Tải danh sách</span>
+            </button>
+        </div>
+
+        <h1 style="color: #7c3aed; margin-bottom: 32px; text-align: center;">Quản lý từ vựng</h1>
+
+        <div class="form-group" style="margin-bottom: 32px;">
+            <input type="text" 
+                   id="searchInput" 
+                   class="form-input" 
+                   placeholder="Tìm kiếm từ vựng..."
+                   style="padding-left: 40px;"
+                   oninput="searchVocab(this.value)">
+            <div style="position: relative; margin-top: -38px; margin-left: 12px; pointer-events: none;">
+                🔍
+            </div>
+        </div>
+
+        <div id="searchResults" class="word-list" style="display: none; margin-bottom: 32px;">
+            <h2 style="color: #7c3aed; margin-bottom: 24px;">Kết quả tìm kiếm từ trang chủ</h2>
+            <div id="mainWordList"></div>
+        </div>
+
+        <div id="successMessage" class="success-message">
+            Đã thêm từ mới thành công!
+        </div>
+        <div id="errorMessage" class="error-message">
+            Từ này đã tồn tại trong danh sách!
+        </div>
+
+        <form id="addWordForm" onsubmit="addNewWord(event)">
+            <input type="hidden" id="editIndex" value="-1">
+            <div class="form-group">
+                <label class="form-label" for="english">Tiếng Anh</label>
+                <input type="text" id="english" class="form-input" required>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="vietnamese">Nghĩa Tiếng Việt</label>
+                <div style="position: relative;">
+                    <div class="editor-toolbar">
+                        <button type="button" onclick="formatVietnamese('bold')" title="In đậm">B</button>
+                        <button type="button" onclick="formatVietnamese('italic')" title="In nghiêng">I</button>
+                        <button type="button" onclick="formatVietnamese('underline')" title="Gạch chân">U</button>
+                        <span class="divider">|</span>
+                        <button type="button" onclick="changeVietnameseColor('#7c3aed')" title="Màu tím" style="color: #7c3aed">A</button>
+                        <button type="button" onclick="changeVietnameseColor('#dc2626')" title="Màu đỏ" style="color: #dc2626">A</button>
+                        <button type="button" onclick="changeVietnameseColor('#000000')" title="Màu đen" style="color: #000000">A</button>
+                    </div>
+                    <div id="vietnamese" 
+                         class="rich-editor" 
+                         contenteditable="true" 
+                         placeholder="Nhập nghĩa tiếng Việt..."
+                         onpaste="handleVietnamesePaste(event)"
+                         required></div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="phonetic">Phiên âm (không bắt buộc)</label>
+                <input type="text" id="phonetic" class="form-input" placeholder="Ví dụ: /həˈləʊ/">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="type">Loại từ / Cấu trúc (không bắt buộc)</label>
+                <input type="text" id="type" class="form-input" placeholder="Ví dụ: + to V/ V-ing">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="example">Ví dụ (không bắt buộc)</label>
+                <div style="position: relative;">
+                    <div class="editor-toolbar">
+                        <button type="button" onclick="formatText('bold')" title="In đậm">B</button>
+                        <button type="button" onclick="formatText('italic')" title="In nghiêng">I</button>
+                        <button type="button" onclick="formatText('underline')" title="Gạch chân">U</button>
+                        <span class="divider">|</span>
+                        <button type="button" onclick="changeColor('#7c3aed')" title="Màu tím" style="color: #7c3aed">A</button>
+                        <button type="button" onclick="changeColor('#dc2626')" title="Màu đỏ" style="color: #dc2626">A</button>
+                        <button type="button" onclick="changeColor('#000000')" title="Màu đen" style="color: #000000">A</button>
+                    </div>
+                    <div id="example" 
+                         class="rich-editor" 
+                         contenteditable="true" 
+                         placeholder="Nhập một câu ví dụ..."
+                         onpaste="handlePaste(event)"></div>
+                </div>
+            </div>
+
+            <div style="display: flex; gap: 16px;">
+                <button type="submit" 
+                        id="submitButton"
+                        style="flex: 1;
+                               padding: 16px;
+                               background: #7c3aed;
+                               color: white;
+                               border: none;
+                               border-radius: 12px;
+                               font-size: 18px;
+                               font-weight: 600;
+                               cursor: pointer;
+                               transition: all 0.3s;"
+                        onmouseover="this.style.background='#6d28d9'"
+                        onmouseout="this.style.background='#7c3aed'">
+                    Thêm từ mới
+                </button>
+                <button type="button" 
+                        onclick="cancelEdit()"
+                        id="cancelButton"
+                        style="flex: 1;
+                               padding: 16px;
+                               background: #ef4444;
+                               color: white;
+                               border: none;
+                               border-radius: 12px;
+                               font-size: 18px;
+                               font-weight: 600;
+                               cursor: pointer;
+                               transition: all 0.3s;
+                               display: none;"
+                        onmouseover="this.style.background='#dc2626'"
+                        onmouseout="this.style.background='#ef4444'">
+                    Hủy
+                </button>
+            </div>
+        </form>
+
+        <div class="word-list">
+            <h2 style="color: #7c3aed; margin-bottom: 24px;">Danh sách từ mới đã thêm</h2>
+            <div id="wordList"></div>
+        </div>
+    </div>
+
+    <script>
+        let newWords = [];
+        let mainVocabList = [];
+        
+        // Load existing words from localStorage and merge with vocabList from index.html
+        function loadWords() {
+            const savedWords = localStorage.getItem('newWords');
+            if (savedWords) {
+                newWords = JSON.parse(savedWords);
+            }
+            
+            // Load main vocabulary list
+            const savedMainVocab = localStorage.getItem('mainVocabList');
+            if (savedMainVocab) {
+                mainVocabList = JSON.parse(savedMainVocab);
+            }
+            
+            // Thêm từ từ localStorage vào vocabList trong trang chủ
+            try {
+                const mainVocabList = localStorage.getItem('mainVocabList');
+                if (mainVocabList) {
+                    const mainWords = JSON.parse(mainVocabList);
+                    // Chỉ thêm những từ chưa có trong mainVocabList
+                    newWords = newWords.filter(newWord => 
+                        !mainWords.some(mainWord => 
+                            mainWord.english.toLowerCase() === newWord.english.toLowerCase()
+                        )
+                    );
+                }
+            } catch (error) {
+                console.error('Lỗi khi đồng bộ với danh sách chính:', error);
+            }
+            
+            displayWords();
+        }
+
+        // Save words to localStorage and update main vocab list
+        function saveWords() {
+            localStorage.setItem('newWords', JSON.stringify(newWords));
+            
+            // Cập nhật vocabList trong trang chủ
+            try {
+                const mainVocabList = localStorage.getItem('mainVocabList');
+                let mainWords = mainVocabList ? JSON.parse(mainVocabList) : [];
+                
+                // Lọc ra những từ chưa có trong mainWords
+                const newUniqueWords = newWords.filter(newWord => 
+                    !mainWords.some(mainWord => 
+                        mainWord.english.toLowerCase() === newWord.english.toLowerCase()
+                    )
+                );
+                
+                // Cập nhật mainVocabList với những từ mới
+                mainWords = [...mainWords, ...newUniqueWords];
+                localStorage.setItem('mainVocabList', JSON.stringify(mainWords));
+                
+                // Thông báo cho trang chủ cập nhật
+                localStorage.setItem('vocabUpdated', Date.now().toString());
+                
+                // Nếu trang chủ đang mở, gửi thông báo để cập nhật
+                if (window.opener && !window.opener.closed) {
+                    window.opener.location.reload();
+                }
+            } catch (error) {
+                console.error('Lỗi khi lưu vào danh sách chính:', error);
+            }
+        }
+
+        function addNewWord(event) {
+            event.preventDefault();
+
+            const editIndex = parseInt(document.getElementById('editIndex').value);
+            const editMainIndex = parseInt(document.getElementById('editIndex').getAttribute('data-main-index') || '-1');
+            const word = {
+                english: document.getElementById('english').value,
+                vietnamese: document.getElementById('vietnamese').innerHTML,
+                phonetic: document.getElementById('phonetic').value,
+                type: document.getElementById('type').value,
+                example: document.getElementById('example').innerHTML
+            };
+
+            const isDuplicate = mainVocabList.some(
+                existing => existing.english.toLowerCase() === word.english.toLowerCase()
+            ) || newWords.some(
+                existing => existing.english.toLowerCase() === word.english.toLowerCase()
+            );
+
+            if (editMainIndex >= 0) {
+                // Đang sửa từ từ danh sách chính
+                if (isDuplicate && mainVocabList[editMainIndex].english.toLowerCase() !== word.english.toLowerCase()) {
+                    showErrorMessage('Từ này đã tồn tại trong danh sách!');
+                    return;
+                }
+                mainVocabList[editMainIndex] = word;
+                localStorage.setItem('mainVocabList', JSON.stringify(mainVocabList));
+                localStorage.setItem('vocabUpdated', Date.now().toString());
+                if (window.opener && !window.opener.closed) {
+                    window.opener.location.reload();
+                }
+            } else if (editIndex >= 0) {
+                // Đang sửa từ từ danh sách mới
+                if (isDuplicate && newWords[editIndex].english.toLowerCase() !== word.english.toLowerCase()) {
+                    showErrorMessage('Từ này đã tồn tại trong danh sách!');
+                    return;
+                }
+                newWords[editIndex] = word;
+            } else {
+                // Thêm từ mới
+                if (isDuplicate) {
+                    showErrorMessage('Từ này đã tồn tại trong danh sách!');
+                    return;
+                }
+                newWords.unshift(word);
+            }
+
+            saveWords();
+            displayWords();
+            showSuccessMessage(editIndex >= 0 ? 'Đã cập nhật từ thành công!' : 'Đã thêm từ mới thành công!');
+            
+            // Clear form
+            document.getElementById('addWordForm').reset();
+            document.getElementById('editIndex').value = -1;
+            document.getElementById('editIndex').removeAttribute('data-main-index');
+            // Clear rich text editors
+            document.getElementById('example').innerHTML = '';
+            document.getElementById('vietnamese').innerHTML = '';
+            // Reset button text and hide cancel button
+            document.getElementById('submitButton').textContent = 'Thêm từ';
+            document.getElementById('cancelButton').style.display = 'none';
+            // Focus on first field
+            document.getElementById('english').focus();
+            // Update search results
+            displayWords();
+        }
+
+        function editWord(index) {
+            const word = newWords[index];
+            // Cập nhật các trường text thông thường
+            document.getElementById('english').value = word.english;
+            document.getElementById('phonetic').value = word.phonetic || '';
+            document.getElementById('type').value = word.type || '';
+            
+            // Cập nhật nội dung HTML
+            document.getElementById('vietnamese').innerHTML = word.vietnamese || '';
+            document.getElementById('example').innerHTML = word.example || '';
+            
+            document.getElementById('editIndex').value = index;
+            
+            // Cập nhật UI
+            document.getElementById('submitButton').textContent = 'Cập nhật';
+            document.getElementById('cancelButton').style.display = 'block';
+            
+            // Scroll to form
+            document.getElementById('addWordForm').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function cancelEdit() {
+            const form = document.getElementById('addWordForm');
+            form.reset();
+            document.getElementById('editIndex').value = -1;
+            document.getElementById('editIndex').removeAttribute('data-main-index');
+            
+            // Xóa nội dung HTML
+            document.getElementById('example').innerHTML = '';
+            document.getElementById('vietnamese').innerHTML = '';
+            
+            document.getElementById('submitButton').textContent = 'Thêm từ mới';
+            document.getElementById('cancelButton').style.display = 'none';
+        }
+
+        function displayWords() {
+            const wordList = document.getElementById('wordList');
+            wordList.innerHTML = newWords.map((word, index) => `
+                <div class="word-item" data-word='${JSON.stringify(word)}'>
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <div style="display: flex; align-items: baseline; gap: 12px;">
+                                <div class="word-english">${word.english}</div>
+                                ${word.phonetic ? `<div class="word-phonetic" style="margin-bottom: 0">${word.phonetic}</div>` : ''}
+                            </div>
+                        </div>
+                        <div style="display: flex; gap: 8px;">
+                            <button onclick="editWord(${index})"
+                                    style="background: none;
+                                           border: none;
+                                           color: #7c3aed;
+                                           cursor: pointer;
+                                           padding: 8px;
+                                           border-radius: 4px;"
+                                    onmouseover="this.style.background='#f5f3ff'"
+                                    onmouseout="this.style.background='none'">
+                                ✎
+                            </button>
+                            <button onclick="deleteWord(${index})"
+                                    style="background: none;
+                                           border: none;
+                                           color: #ef4444;
+                                           cursor: pointer;
+                                           padding: 8px;
+                                           border-radius: 4px;"
+                                    onmouseover="this.style.background='#fee2e2'"
+                                    onmouseout="this.style.background='none'">
+                                ✕
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function deleteWord(index) {
+            if (confirm('Bạn có chắc muốn xóa từ này?')) {
+                newWords.splice(index, 1);
+                saveWords();
+                displayWords();
+            }
+        }
+
+        function searchVocab(query) {
+            const searchResults = document.getElementById('searchResults');
+            const mainWordList = document.getElementById('mainWordList');
+            
+            if (!query.trim()) {
+                searchResults.style.display = 'none';
+                return;
+            }
+            
+            const results = mainVocabList.filter(word => 
+                word.english.toLowerCase().includes(query.toLowerCase()) ||
+                word.vietnamese.toLowerCase().includes(query.toLowerCase())
+            );
+            
+            if (results.length > 0) {
+                mainWordList.innerHTML = results.map((word, index) => {
+                    const mainIndex = mainVocabList.findIndex(w => w.english === word.english);
+                    return `
+                        <div class="word-item">
+                            <div style="display: flex; justify-content: space-between; align-items: start;">
+                                <div>
+                                    <div class="word-english">${word.english}</div>
+                                    <div class="word-vietnamese">${word.vietnamese}</div>
+                                    ${word.phonetic ? `<div class="word-phonetic">${word.phonetic}</div>` : ''}
+                                    ${word.type ? `<div class="word-phonetic">${word.type}</div>` : ''}
+                                    ${word.example ? `<div class="word-example">${word.example}</div>` : ''}
+                                </div>
+                                <button onclick="editMainWord(${mainIndex})"
+                                        style="background: none;
+                                               border: none;
+                                               color: #7c3aed;
+                                               cursor: pointer;
+                                               padding: 8px;
+                                               border-radius: 4px;"
+                                        onmouseover="this.style.background='#f5f3ff'"
+                                        onmouseout="this.style.background='none'">
+                                    ✎ Sửa
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+                searchResults.style.display = 'block';
+            } else {
+                mainWordList.innerHTML = '<p style="color: #6b7280; text-align: center;">Không tìm thấy kết quả</p>';
+                searchResults.style.display = 'block';
+            }
+        }
+
+        function editMainWord(mainIndex) {
+            const word = mainVocabList[mainIndex];
+            // Cập nhật các trường text thông thường
+            document.getElementById('english').value = word.english;
+            document.getElementById('phonetic').value = word.phonetic || '';
+            document.getElementById('type').value = word.type || '';
+            
+            // Cập nhật nội dung HTML
+            document.getElementById('vietnamese').innerHTML = word.vietnamese || '';
+            document.getElementById('example').innerHTML = word.example || '';
+            
+            const editIndexInput = document.getElementById('editIndex');
+            editIndexInput.value = -1;
+            editIndexInput.setAttribute('data-main-index', mainIndex);
+            
+            // Cập nhật UI
+            document.getElementById('submitButton').textContent = 'Cập nhật từ';
+            document.getElementById('cancelButton').style.display = 'block';
+            
+            // Scroll to form
+            document.getElementById('addWordForm').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function showSuccessMessage(message = 'Đã thêm từ mới thành công!') {
+            const messageElement = document.getElementById('successMessage');
+            const errorElement = document.getElementById('errorMessage');
+            errorElement.style.display = 'none';
+            messageElement.textContent = message;
+            messageElement.style.display = 'block';
+            setTimeout(() => {
+                messageElement.style.display = 'none';
+            }, 3000);
+        }
+
+        function showErrorMessage(message = 'Từ này đã tồn tại trong danh sách!') {
+            const messageElement = document.getElementById('errorMessage');
+            const successElement = document.getElementById('successMessage');
+            successElement.style.display = 'none';
+            messageElement.textContent = message;
+            messageElement.style.display = 'block';
+            // Thêm lại animation bằng cách xóa và thêm lại class
+            messageElement.style.animation = 'none';
+            messageElement.offsetHeight; // Trigger reflow
+            messageElement.style.animation = 'shake 0.5s';
+            setTimeout(() => {
+                messageElement.style.display = 'none';
+            }, 3000);
+            // Focus vào ô nhập liệu
+            document.getElementById('english').focus();
+        }
+
+        function downloadVocabList() {
+            const content = JSON.stringify(newWords, null, 2);
+            const blob = new Blob([content], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'tu_vung_moi.json';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        function formatText(command) {
+            document.execCommand(command, false, null);
+        }
+
+        function formatVietnamese(command) {
+            document.execCommand(command, false, null);
+        }
+
+        function changeColor(color) {
+            document.execCommand('foreColor', false, color);
+        }
+
+        function changeVietnameseColor(color) {
+            document.execCommand('foreColor', false, color);
+        }
+
+        function handlePaste(e) {
+            e.preventDefault();
+            const text = e.clipboardData.getData('text/plain');
+            document.execCommand('insertText', false, text);
+        }
+
+        function handleVietnamesePaste(e) {
+            e.preventDefault();
+            const text = e.clipboardData.getData('text/plain');
+            document.execCommand('insertText', false, text);
+        }
+
+        // Load words when page loads
+        loadWords();
+    </script>
+</body>
+</html>
