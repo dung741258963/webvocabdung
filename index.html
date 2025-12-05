@@ -349,6 +349,17 @@
                     </div>
                 </div>
 
+                <div style="margin-bottom: 20px;">
+                    <label class="form-label" style="color: #6b7280; font-size: 14px; margin-bottom: 8px; display: block;">Lọc theo chủ đề:</label>
+                    <select id="topicFilter" style="width: 100%; padding: 10px; border-radius: 8px; border: 2px solid #e5e7eb; 
+                                                   font-size: 14px; outline: none; transition: all 0.3s; background: white;"
+                            onchange="filterByTopic(this.value)"
+                            onfocus="this.style.borderColor='#7c3aed';this.style.boxShadow='0 0 0 3px rgba(124,58,237,0.1)'"
+                            onblur="this.style.borderColor='#e5e7eb';this.style.boxShadow='0 2px 4px rgba(0,0,0,0.05)'">
+                        <option value="">-- Tất cả chủ đề --</option>
+                    </select>
+                </div>
+
                 <div class="mode-buttons">
                     <button class="mode-btn active" onclick="setMode('all')" style="flex:1;">
                         Flashcards
@@ -559,20 +570,36 @@
         }
 
         function searchVocab(query) {
+            const topicFilter = document.getElementById('topicFilter').value;
+            let filteredByTopic = vocabList;
+            
+            // Lọc theo chủ đề trước
+            if (topicFilter) {
+                filteredByTopic = vocabList.filter(word => 
+                    word.topic && word.topic.toLowerCase() === topicFilter.toLowerCase()
+                );
+            }
+            
             if (!query.trim()) {
                 if (mode === 'needReview') {
-                    displayCards = vocabList.filter((_, index) => needReview.includes(index));
+                    displayCards = filteredByTopic.filter((_, index) => {
+                        const actualIndex = vocabList.indexOf(vocabList.find(v => v.english === filteredByTopic[_].english));
+                        return needReview.includes(actualIndex);
+                    });
                 } else {
-                    displayCards = [...vocabList];
+                    displayCards = [...filteredByTopic];
                 }
             } else {
                 query = query.toLowerCase();
-                displayCards = vocabList.filter(word => 
+                displayCards = filteredByTopic.filter(word => 
                     word.english.toLowerCase().includes(query) || 
                     word.vietnamese.toLowerCase().includes(query)
                 );
                 if (mode === 'needReview') {
-                    displayCards = displayCards.filter((_, index) => needReview.includes(index));
+                    displayCards = displayCards.filter((word) => {
+                        const actualIndex = vocabList.indexOf(vocabList.find(v => v.english === word.english));
+                        return needReview.includes(actualIndex);
+                    });
                 }
             }
             currentCard = 0;
@@ -580,6 +607,60 @@
             document.getElementById('cardFront').classList.remove('hidden');
             document.getElementById('cardBack').classList.add('hidden');
             updateDisplay();
+        }
+
+        function filterByTopic(topic) {
+            const searchInput = document.getElementById('searchInput').value;
+            let filteredByTopic = vocabList;
+            
+            if (topic) {
+                filteredByTopic = vocabList.filter(word => 
+                    word.topic && word.topic.toLowerCase() === topic.toLowerCase()
+                );
+            }
+            
+            if (searchInput.trim()) {
+                const query = searchInput.toLowerCase();
+                displayCards = filteredByTopic.filter(word => 
+                    word.english.toLowerCase().includes(query) || 
+                    word.vietnamese.toLowerCase().includes(query)
+                );
+            } else {
+                displayCards = [...filteredByTopic];
+            }
+            
+            if (mode === 'needReview') {
+                displayCards = displayCards.filter((word) => {
+                    const actualIndex = vocabList.indexOf(vocabList.find(v => v.english === word.english));
+                    return needReview.includes(actualIndex);
+                });
+            }
+            
+            currentCard = 0;
+            isFlipped = false;
+            document.getElementById('cardFront').classList.remove('hidden');
+            document.getElementById('cardBack').classList.add('hidden');
+            updateDisplay();
+        }
+
+        function updateTopicFilter() {
+            const topicFilter = document.getElementById('topicFilter');
+            const topics = new Set();
+            vocabList.forEach(word => {
+                if (word.topic && word.topic.trim()) {
+                    topics.add(word.topic.trim());
+                }
+            });
+            
+            const selectedValue = topicFilter.value;
+            topicFilter.innerHTML = '<option value="">-- Tất cả chủ đề --</option>';
+            Array.from(topics).sort().forEach(topic => {
+                const option = document.createElement('option');
+                option.value = topic;
+                option.textContent = topic;
+                topicFilter.appendChild(option);
+            });
+            topicFilter.value = selectedValue;
         }
 
         function toggleWordStatus(index) {
@@ -731,6 +812,10 @@
                 btn.classList.remove('active');
             });
             event.currentTarget.classList.add('active');
+            
+            // Reset topic filter
+            const topicFilter = document.getElementById('topicFilter');
+            if (topicFilter) topicFilter.value = '';
             
             // Hiển thị/ẩn các view tương ứng
             if (newMode === 'exercise') {
@@ -1054,6 +1139,7 @@
             learned = [];
             needReview = [];
             mode = 'all';
+            updateTopicFilter();
             updateDisplay();
         }
 

@@ -58,6 +58,16 @@
                 <div style="text-align: center;">
                     <h2 style="color: #7c3aed; font-size: 24px;">Ôn tập từ vựng</h2>
                 </div>
+                <div style="margin-top: 16px;">
+                    <label style="color: #6b7280; font-size: 14px; margin-bottom: 8px; display: block;">Chọn chủ đề:</label>
+                    <select id="topicFilter" style="width: 100%; padding: 10px; border-radius: 8px; border: 2px solid #e5e7eb; 
+                                                   font-size: 14px; outline: none; transition: all 0.3s; background: white;"
+                            onchange="changeTopicAndGenerateExercise(this.value)"
+                            onfocus="this.style.borderColor='#7c3aed';this.style.boxShadow='0 0 0 3px rgba(124,58,237,0.1)'"
+                            onblur="this.style.borderColor='#e5e7eb';this.style.boxShadow='0 2px 4px rgba(0,0,0,0.05)'">
+                        <option value="">-- Tất cả chủ đề --</option>
+                    </select>
+                </div>
             </div>
 
             <div id="exerciseContent" style="background: white; border-radius: 16px; padding: 32px;
@@ -92,6 +102,7 @@
         let vocabList = [];
         let currentExercise = 0;
         let exerciseQuestions = [];
+        let selectedTopic = '';
 
         function loadVocabulary() {
             const savedVocab = localStorage.getItem('mainVocabList');
@@ -103,6 +114,7 @@
                     vocabList = [];
                 }
             }
+            updateTopicFilter();
             if (vocabList.length === 0) {
                 showEmptyMessage();
             } else {
@@ -110,9 +122,45 @@
             }
         }
 
+        function updateTopicFilter() {
+            const topicFilter = document.getElementById('topicFilter');
+            const topics = new Set();
+            vocabList.forEach(word => {
+                if (word.topic && word.topic.trim()) {
+                    topics.add(word.topic.trim());
+                }
+            });
+            
+            const selectedValue = topicFilter.value;
+            topicFilter.innerHTML = '<option value="">-- Tất cả chủ đề --</option>';
+            Array.from(topics).sort().forEach(topic => {
+                const option = document.createElement('option');
+                option.value = topic;
+                option.textContent = topic;
+                topicFilter.appendChild(option);
+            });
+            topicFilter.value = selectedValue;
+        }
+
+        function changeTopicAndGenerateExercise(topic) {
+            selectedTopic = topic;
+            generateExercise();
+        }
+
         function generateExercise() {
             exerciseQuestions = [];
             let words = [...vocabList];
+            
+            // Lọc theo chủ đề nếu có chọn
+            if (selectedTopic) {
+                words = words.filter(word => word.topic && word.topic.toLowerCase() === selectedTopic.toLowerCase());
+            }
+            
+            if (words.length === 0) {
+                showEmptyMessage();
+                return;
+            }
+
             // Tạo câu hỏi dựa trên số lượng từ hiện có, tối đa 10
             const questionCount = Math.min(10, words.length);
             for(let i = 0; i < questionCount; i++) {
