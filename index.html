@@ -491,6 +491,34 @@
         let displayCards = [...vocabList];
 
         function updateDisplay() {
+            // Update stats even if displayCards is empty
+            const statsElements = {
+                'currentStat': displayCards.length === 0 ? '0/0' : `${currentCard + 1}/${displayCards.length}`,
+                'navCurrent': displayCards.length === 0 ? '0' : currentCard + 1,
+                'navTotal': displayCards.length,
+                'learnedStat': learned.length,
+                'reviewStat': needReview.length,
+                'reviewCount': needReview.length,
+                'totalCount': vocabList.length
+            };
+
+            for (const [id, value] of Object.entries(statsElements)) {
+                const element = document.getElementById(id);
+                if (element) {
+                    element.textContent = value;
+                }
+            }
+
+            // Handle button states
+            const prevBtn = document.getElementById('prevBtn');
+            const nextBtn = document.getElementById('nextBtn');
+            const reviewModeBtn = document.getElementById('reviewModeBtn');
+
+            if (prevBtn) prevBtn.disabled = currentCard === 0 || displayCards.length === 0;
+            if (nextBtn) nextBtn.disabled = currentCard === displayCards.length - 1 || displayCards.length === 0;
+            if (reviewModeBtn) reviewModeBtn.disabled = needReview.length === 0;
+
+            // Return early if no cards to display
             if (!displayCards || displayCards.length === 0) return;
             
             const card = displayCards[currentCard];
@@ -503,14 +531,7 @@
                 'phoneticFront': card.phonetic || '',
                 'phoneticBack': card.phonetic || '',
                 'formulaFront': card.type || '',
-                'formulaBack': card.type || '',
-                'currentStat': `${currentCard + 1}/${displayCards.length}`,
-                'navCurrent': currentCard + 1,
-                'navTotal': displayCards.length,
-                'learnedStat': learned.length,
-                'reviewStat': needReview.length,
-                'reviewCount': needReview.length,
-                'totalCount': vocabList.length
+                'formulaBack': card.type || ''
             };
 
             // Safely update each element
@@ -532,14 +553,6 @@
                 vietnameseElement.innerHTML = card.vietnamese;
             }
 
-            // Handle button states
-            const prevBtn = document.getElementById('prevBtn');
-            const nextBtn = document.getElementById('nextBtn');
-            const reviewModeBtn = document.getElementById('reviewModeBtn');
-
-            if (prevBtn) prevBtn.disabled = currentCard === 0;
-            if (nextBtn) nextBtn.disabled = currentCard === displayCards.length - 1;
-            if (reviewModeBtn) reviewModeBtn.disabled = needReview.length === 0;
             if (isFlipped) {
                 document.getElementById('actionButtons').classList.remove('hidden');
             } else {
@@ -1026,12 +1039,22 @@
         function loadVocabulary() {
             const savedVocab = localStorage.getItem('mainVocabList');
             if (savedVocab) {
-                vocabList = JSON.parse(savedVocab);
+                try {
+                    vocabList = JSON.parse(savedVocab);
+                } catch (e) {
+                    console.error('Error parsing saved vocabulary:', e);
+                    localStorage.removeItem('mainVocabList');
+                }
             } else {
                 // If no saved vocabulary, save the default one
                 localStorage.setItem('mainVocabList', JSON.stringify(vocabList));
             }
             displayCards = [...vocabList];
+            currentCard = 0;
+            isFlipped = false;
+            learned = [];
+            needReview = [];
+            mode = 'all';
             updateDisplay();
         }
 
