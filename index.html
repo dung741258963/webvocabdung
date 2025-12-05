@@ -816,8 +816,9 @@
         function generateExercise() {
             exerciseQuestions = [];
             let words = [...vocabList];
-            // Tạo 10 câu hỏi ngẫu nhiên
-            for(let i = 0; i < 10; i++) {
+            // Tạo câu hỏi dựa trên số lượng từ hiện có, tối đa 10
+            const questionCount = Math.min(10, words.length);
+            for(let i = 0; i < questionCount; i++) {
                 if(words.length === 0) break;
                 const randomIndex = Math.floor(Math.random() * words.length);
                 exerciseQuestions.push(words[randomIndex]);
