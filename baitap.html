@@ -5,10 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bài tập từ vựng</title>
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
             margin: 0;
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-            background: #f8fafc;
+            background: linear-gradient(135deg, #f5f3ff 0%, #fce7f3 100%);
             min-height: 100vh;
             display: flex;
             flex-direction: column;
@@ -20,10 +26,483 @@
             max-width: 800px;
             margin: 0 auto;
             width: 100%;
+            display: flex;
+            flex-direction: column;
         }
 
         .hidden {
             display: none !important;
+        }
+
+        .header {
+            background: white;
+            border-radius: 16px 16px 0 0;
+            padding: 24px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin-bottom: 0;
+        }
+
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .back-btn {
+            padding: 8px 16px;
+            border-radius: 8px;
+            border: none;
+            background: #f5f3ff;
+            color: #7c3aed;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 14px;
+        }
+
+        .back-btn:hover {
+            background: #ede9fe;
+            transform: translateY(-1px);
+        }
+
+        .progress-info {
+            color: #6b7280;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        h2 {
+            color: #7c3aed;
+            font-size: 24px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .controls-section {
+            background: white;
+            padding: 16px;
+            border-radius: 0;
+            margin-bottom: 0;
+            box-shadow: none;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .control-group {
+            margin-bottom: 14px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .control-group:last-child {
+            margin-bottom: 0;
+        }
+
+        .control-label {
+            color: #6b7280;
+            font-size: 13px;
+            margin-bottom: 6px;
+            display: block;
+            font-weight: 500;
+        }
+
+        .control-input {
+            width: 100%;
+            padding: 10px 12px;
+            border-radius: 8px;
+            border: 2px solid #e5e7eb;
+            font-size: 14px;
+            outline: none;
+            transition: all 0.3s;
+            background: white;
+            font-family: inherit;
+        }
+
+        .control-input:focus {
+            border-color: #7c3aed;
+            box-shadow: 0 0 0 3px rgba(124,58,237,0.1);
+        }
+
+        .control-input:disabled {
+            background: #f3f4f6;
+            color: #9ca3af;
+            cursor: not-allowed;
+        }
+
+        .info-box {
+            background: #f5f3ff;
+            padding: 10px 12px;
+            border-radius: 8px;
+            margin-bottom: 12px;
+            font-size: 13px;
+            color: #6b7280;
+            border-left: 4px solid #7c3aed;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .info-box strong {
+            color: #7c3aed;
+            font-weight: 600;
+        }
+
+        .button-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 12px;
+        }
+
+        .btn-view-words {
+            padding: 10px 12px;
+            border-radius: 8px;
+            border: none;
+            background: #ede9fe;
+            color: #7c3aed;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 13px;
+        }
+
+        .btn-view-words:hover:not(:disabled) {
+            background: #ddd6fe;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 6px rgba(124,58,237,0.2);
+        }
+
+        .btn-view-words:disabled {
+            background: #f3f4f6;
+            color: #9ca3af;
+            cursor: not-allowed;
+        }
+
+        .btn-start {
+            padding: 10px 12px;
+            border-radius: 8px;
+            border: none;
+            background: #7c3aed;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 13px;
+        }
+
+        .btn-start:hover:not(:disabled) {
+            background: #6d28d9;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(124,58,237,0.3);
+        }
+
+        .btn-start:disabled {
+            background: #d1d5db;
+            color: #9ca3af;
+            cursor: not-allowed;
+        }
+
+        .exercise-content-wrapper {
+            background: white;
+            border-radius: 0 0 16px 16px;
+            padding: 32px 24px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 400px;
+        }
+
+        #exerciseContent {
+            width: 100%;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .exercise-word {
+            font-size: 48px;
+            color: #7c3aed;
+            font-weight: bold;
+            margin-bottom: 16px;
+            line-height: 1.2;
+        }
+
+        .exercise-phonetic {
+            color: #6b7280;
+            font-size: 20px;
+            margin-bottom: 32px;
+        }
+
+        .input-wrapper {
+            width: 100%;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        #answerInput {
+            width: 100%;
+            padding: 14px 16px;
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            font-size: 16px;
+            outline: none;
+            transition: all 0.3s;
+            margin-bottom: 12px;
+            font-family: inherit;
+        }
+
+        #answerInput:focus {
+            border-color: #7c3aed;
+            box-shadow: 0 0 0 3px rgba(124,58,237,0.1);
+        }
+
+        #answerInput:disabled {
+            background: #f3f4f6;
+            color: #9ca3af;
+            cursor: not-allowed;
+        }
+
+        #checkBtn {
+            width: 100%;
+            padding: 14px 16px;
+            border-radius: 12px;
+            border: none;
+            background: #7c3aed;
+            color: white;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        #checkBtn:hover:not(:disabled) {
+            background: #6d28d9;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(124,58,237,0.3);
+        }
+
+        #checkBtn:active:not(:disabled) {
+            transform: translateY(0);
+        }
+
+        #checkBtn:disabled {
+            background: #d1d5db;
+            color: #9ca3af;
+            cursor: not-allowed;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.4);
+            backdrop-filter: blur(4px);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 24px;
+            border-radius: 16px;
+            max-width: 420px;
+            width: 90%;
+            max-height: 70vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.2);
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .modal-header {
+            font-size: 18px;
+            font-weight: 600;
+            color: #7c3aed;
+            margin-bottom: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            color: #6b7280;
+            cursor: pointer;
+            font-size: 24px;
+            transition: color 0.2s;
+            padding: 0;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-close:hover {
+            color: #374151;
+        }
+
+        .word-item-list {
+            padding: 12px;
+            background: #f8f7ff;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            border-left: 3px solid #7c3aed;
+            transition: all 0.2s;
+        }
+
+        .word-item-list:hover {
+            background: #f3f0ff;
+            transform: translateX(4px);
+        }
+
+        .word-item-list:last-child {
+            margin-bottom: 0;
+        }
+
+        .word-item-list .english {
+            font-weight: 600;
+            color: #7c3aed;
+            font-size: 14px;
+            margin-bottom: 4px;
+        }
+
+        .word-item-list .vietnamese {
+            color: #374151;
+            font-size: 13px;
+            line-height: 1.4;
+        }
+
+        .word-item-list .phonetic {
+            color: #6b7280;
+            font-size: 12px;
+            margin-top: 4px;
+        }
+
+        .empty-message {
+            text-align: center;
+            padding: 48px 24px;
+            color: #6b7280;
+        }
+
+        .empty-emoji {
+            font-size: 64px;
+            margin-bottom: 16px;
+        }
+
+        .empty-title {
+            font-size: 24px;
+            color: #7c3aed;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+
+        .empty-text {
+            font-size: 16px;
+            color: #6b7280;
+            margin-bottom: 24px;
+        }
+
+        .completion-container {
+            text-align: center;
+            padding: 48px 24px;
+        }
+
+        .completion-emoji {
+            font-size: 64px;
+            margin-bottom: 20px;
+        }
+
+        .completion-title {
+            font-size: 28px;
+            color: #7c3aed;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+
+        .completion-text {
+            color: #6b7280;
+            margin-bottom: 28px;
+            font-size: 16px;
+            line-height: 1.6;
+        }
+
+        .completion-btn {
+            padding: 12px 28px;
+            border-radius: 12px;
+            border: none;
+            background: #7c3aed;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 15px;
+        }
+
+        .completion-btn:hover {
+            background: #6d28d9;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(124,58,237,0.3);
+        }
+
+        /* Responsive */
+        @media (max-width: 600px) {
+            .header {
+                padding: 16px;
+            }
+
+            h2 {
+                font-size: 20px;
+                margin-bottom: 16px;
+            }
+
+            .controls-section {
+                padding: 12px;
+            }
+
+            .exercise-word {
+                font-size: 36px;
+            }
+
+            .exercise-phonetic {
+                font-size: 18px;
+            }
+
+            .exercise-content-wrapper {
+                padding: 24px 16px;
+                min-height: 300px;
+            }
+
+            .button-group {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
@@ -51,22 +530,41 @@
                         <span style="font-size: 18px;">←</span>
                         <span>Trang chủ</span>
                     </button>
-                    <div style="color: #6b7280;">
+                    <div style="color: #6b7280; display: none;" id="progressDisplay">
                         Câu: <span id="exerciseProgress">1</span>/<span id="exerciseTotal">10</span>
                     </div>
                 </div>
                 <div style="text-align: center;">
                     <h2 style="color: #7c3aed; font-size: 24px;">Ôn tập từ vựng</h2>
                 </div>
-                <div style="margin-top: 16px;">
-                    <label style="color: #6b7280; font-size: 14px; margin-bottom: 8px; display: block;">Chọn chủ đề:</label>
-                    <select id="topicFilter" style="width: 100%; padding: 10px; border-radius: 8px; border: 2px solid #e5e7eb; 
-                                                   font-size: 14px; outline: none; transition: all 0.3s; background: white;"
-                            onchange="changeTopicAndGenerateExercise(this.value)"
-                            onfocus="this.style.borderColor='#7c3aed';this.style.boxShadow='0 0 0 3px rgba(124,58,237,0.1)'"
-                            onblur="this.style.borderColor='#e5e7eb';this.style.boxShadow='0 2px 4px rgba(0,0,0,0.05)'">
-                        <option value="">-- Tất cả chủ đề --</option>
-                    </select>
+
+                <div class="controls-section">
+                    <div class="control-group">
+                        <label class="control-label">Chọn chủ đề:</label>
+                        <select id="topicFilter" class="control-input"
+                                onchange="updateWordCount()">
+                            <option value="">-- Tất cả chủ đề --</option>
+                        </select>
+                    </div>
+
+                    <div class="info-box">
+                        <strong>Tổng số từ:</strong> <span id="totalWords">0</span>
+                    </div>
+
+                    <div class="control-group">
+                        <label class="control-label" for="questionCount">Số lượng câu hỏi:</label>
+                        <input type="number" id="questionCount" class="control-input" 
+                               min="1" max="100" value="10" onchange="updateWordCount()">
+                    </div>
+
+                    <div class="button-group">
+                        <button class="btn-view-words" onclick="showWordListModal()">
+                            👁️ Xem danh sách từ
+                        </button>
+                        <button class="btn-start" onclick="startExercise()">
+                            ▶ Bắt đầu
+                        </button>
+                    </div>
                 </div>
             </div>
 
@@ -85,7 +583,7 @@
                            onfocus="this.style.borderColor='#7c3aed';this.style.boxShadow='0 0 0 3px rgba(124,58,237,0.1)'"
                            onblur="this.style.borderColor='#e5e7eb';this.style.boxShadow='none'">
                     
-                    <button onclick="checkAnswer()" 
+                    <button id="checkBtn" onclick="checkAnswer()" 
                             style="width: 100%; padding: 16px; border-radius: 12px; border: none;
                                    background: #7c3aed; color: white; font-size: 18px; font-weight: 600; 
                                    cursor: pointer; transition: all 0.3s;"
@@ -98,11 +596,23 @@
         </div>
     </div>
 
+    <!-- Modal xem danh sách từ -->
+    <div id="wordListModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span>Danh sách từ vựng</span>
+                <button class="modal-close" onclick="closeWordListModal()">✕</button>
+            </div>
+            <div id="wordListContent" style="max-height: 400px; overflow-y: auto;"></div>
+        </div>
+    </div>
+
     <script>
         let vocabList = [];
         let currentExercise = 0;
         let exerciseQuestions = [];
         let selectedTopic = '';
+        let isExerciseActive = false;
 
         function loadVocabulary() {
             const savedVocab = localStorage.getItem('mainVocabList');
@@ -115,11 +625,7 @@
                 }
             }
             updateTopicFilter();
-            if (vocabList.length === 0) {
-                showEmptyMessage();
-            } else {
-                generateExercise();
-            }
+            updateWordCount();
         }
 
         function updateTopicFilter() {
@@ -142,39 +648,120 @@
             topicFilter.value = selectedValue;
         }
 
-        function changeTopicAndGenerateExercise(topic) {
+        function updateWordCount() {
+            const topic = document.getElementById('topicFilter').value;
             selectedTopic = topic;
-            generateExercise();
-        }
-
-        function generateExercise() {
-            exerciseQuestions = [];
-            let words = [...vocabList];
             
-            // Lọc theo chủ đề nếu có chọn
-            if (selectedTopic) {
-                words = words.filter(word => word.topic && word.topic.toLowerCase() === selectedTopic.toLowerCase());
+            let filteredWords = vocabList;
+            if (topic) {
+                filteredWords = vocabList.filter(word => 
+                    word.topic && word.topic.toLowerCase() === topic.toLowerCase()
+                );
             }
             
+            const totalWords = filteredWords.length;
+            document.getElementById('totalWords').textContent = totalWords;
+            
+            // Cập nhật max value của input
+            const questionInput = document.getElementById('questionCount');
+            questionInput.max = totalWords;
+            
+            // Nếu giá trị hiện tại vượt quá max, reset về max
+            if (parseInt(questionInput.value) > totalWords) {
+                questionInput.value = Math.max(1, totalWords);
+            }
+
+            if (totalWords === 0) {
+                document.getElementById('questionCount').disabled = true;
+                document.querySelector('.btn-start').disabled = true;
+                document.querySelector('.btn-view-words').disabled = true;
+            } else {
+                document.getElementById('questionCount').disabled = false;
+                document.querySelector('.btn-start').disabled = false;
+                document.querySelector('.btn-view-words').disabled = false;
+            }
+        }
+
+        function showWordListModal() {
+            const topic = document.getElementById('topicFilter').value;
+            let filteredWords = vocabList;
+            if (topic) {
+                filteredWords = vocabList.filter(word => 
+                    word.topic && word.topic.toLowerCase() === topic.toLowerCase()
+                );
+            }
+
+            const wordListContent = document.getElementById('wordListContent');
+            
+            if (filteredWords.length === 0) {
+                wordListContent.innerHTML = '<p style="color: #6b7280; text-align: center;">Không có từ nào</p>';
+            } else {
+                wordListContent.innerHTML = filteredWords.map(word => `
+                    <div class="word-item-list">
+                        <div class="english">${word.english}</div>
+                        <div class="vietnamese">${word.vietnamese}</div>
+                        ${word.phonetic ? `<div class="phonetic">${word.phonetic}</div>` : ''}
+                    </div>
+                `).join('');
+            }
+
+            document.getElementById('wordListModal').classList.add('show');
+        }
+
+        function closeWordListModal() {
+            document.getElementById('wordListModal').classList.remove('show');
+        }
+
+        function startExercise() {
+            const topic = document.getElementById('topicFilter').value;
+            const questionCount = parseInt(document.getElementById('questionCount').value);
+            
+            let words = vocabList;
+            if (topic) {
+                words = vocabList.filter(word => 
+                    word.topic && word.topic.toLowerCase() === topic.toLowerCase()
+                );
+            }
+
             if (words.length === 0) {
-                showEmptyMessage();
+                alert('Vui lòng chọn chủ đề có từ vựng');
                 return;
             }
 
-            // Tạo câu hỏi dựa trên số lượng từ hiện có, tối đa 10
-            const questionCount = Math.min(10, words.length);
-            for(let i = 0; i < questionCount; i++) {
-                if(words.length === 0) break;
-                const randomIndex = Math.floor(Math.random() * words.length);
-                exerciseQuestions.push(words[randomIndex]);
-                words.splice(randomIndex, 1);
+            if (isNaN(questionCount) || questionCount <= 0) {
+                alert('Vui lòng nhập số lượng câu hỏi hợp lệ');
+                return;
             }
+
+            isExerciseActive = true;
+            generateExercise(words, questionCount);
+
+            generateExercise(words, questionCount);
+            isExerciseActive = true;
+        }
+
+        function generateExercise(words, questionCount) {
+            exerciseQuestions = [];
+            let selectedWords = [...words];
+            
+            // Tạo câu hỏi dựa trên số lượng yêu cầu
+            const count = Math.min(questionCount || 10, selectedWords.length);
+            for(let i = 0; i < count; i++) {
+                if(selectedWords.length === 0) break;
+                const randomIndex = Math.floor(Math.random() * selectedWords.length);
+                exerciseQuestions.push(selectedWords[randomIndex]);
+                selectedWords.splice(randomIndex, 1);
+            }
+            
             currentExercise = 0;
+            // Hiển thị progress display khi bắt đầu bài tập
+            const progressDisplay = document.getElementById('progressDisplay');
+            if (progressDisplay) progressDisplay.style.display = 'block';
             showCurrentExercise();
         }
 
         function showCurrentExercise() {
-            if (!exerciseQuestions || currentExercise >= exerciseQuestions.length) {
+            if (!exerciseQuestions || exerciseQuestions.length === 0 || currentExercise >= exerciseQuestions.length) {
                 return;
             }
             
@@ -188,16 +775,28 @@
             const answerInput = document.getElementById('answerInput');
             
             if (exerciseWord) exerciseWord.textContent = word.english;
-            if (exercisePhonetic) exercisePhonetic.textContent = word.phonetic;
+            if (exercisePhonetic) exercisePhonetic.textContent = word.phonetic || '';
             if (exerciseProgress) exerciseProgress.textContent = currentExercise + 1;
             if (exerciseTotal) exerciseTotal.textContent = exerciseQuestions.length;
             if (answerInput) {
                 answerInput.value = '';
+                answerInput.disabled = false;
                 answerInput.focus();
+            }
+            
+            // Đảm bảo button "Kiểm tra" không bị disabled
+            const checkBtn = document.getElementById('checkBtn');
+            if (checkBtn) {
+                checkBtn.disabled = false;
+                checkBtn.textContent = 'Kiểm tra';
             }
         }
 
         function checkAnswer() {
+            if (!isExerciseActive || !exerciseQuestions || currentExercise >= exerciseQuestions.length) {
+                return;
+            }
+
             const answer = document.getElementById('answerInput').value.trim().toLowerCase();
             const correctAnswer = exerciseQuestions[currentExercise].vietnamese.toLowerCase();
             
@@ -212,14 +811,22 @@
             showFeedback(isCorrect);
             
             if(isCorrect) {
+                // Disable input và button tạm thời
+                const answerInput = document.getElementById('answerInput');
+                const checkBtn = document.getElementById('checkBtn');
+                answerInput.disabled = true;
+                checkBtn.disabled = true;
+                checkBtn.textContent = 'Đợi...';
+
                 setTimeout(() => {
                     currentExercise++;
                     if(currentExercise < exerciseQuestions.length) {
                         showCurrentExercise();
                     } else {
+                        isExerciseActive = false;
                         showExerciseComplete();
                     }
-                }, 1000);
+                }, 1500);
             }
         }
 
@@ -271,7 +878,7 @@
                         </div>
                     </div>
                     <div style="color: #6b7280; font-size: 14px;">
-                        "${currentWord.example}"
+                        "${currentWord.example || ''}"
                     </div>
                 `;
             } else {
@@ -291,7 +898,7 @@
                         </div>
                     </div>
                     <div style="color: #6b7280; font-size: 14px;">
-                        "${currentWord.example}"
+                        "${currentWord.example || ''}"
                     </div>
                 `;
             }
@@ -321,6 +928,10 @@
 
         function showExerciseComplete() {
             const exerciseContent = document.getElementById('exerciseContent');
+            // Ẩn progress display khi hoàn thành bài tập
+            const progressDisplay = document.getElementById('progressDisplay');
+            if (progressDisplay) progressDisplay.style.display = 'none';
+            
             const completeHTML = `
                 <div style="text-align: center; padding: 48px;">
                     <div style="font-size: 64px; margin-bottom: 24px;">🎉</div>
@@ -332,7 +943,7 @@
                         Hãy thử thách bản thân với bộ từ vựng mới nhé!
                     </p>
                     <div style="display: flex; gap: 16px; justify-content: center;">
-                        <button onclick="generateExercise()"
+                        <button onclick="location.reload()"
                                 style="padding: 14px 28px; border-radius: 12px; border: none;
                                        background: #7c3aed; color: white; font-weight: 600;
                                        cursor: pointer; transition: all 0.3s; font-size: 16px;
@@ -351,33 +962,13 @@
             exerciseContent.innerHTML = completeHTML;
         }
 
-        function showEmptyMessage() {
-            const exerciseContent = document.getElementById('exerciseContent');
-            exerciseContent.innerHTML = `
-                <div style="text-align: center; padding: 48px;">
-                    <div style="font-size: 64px; margin-bottom: 24px;">📚</div>
-                    <h2 style="font-size: 32px; color: #7c3aed; margin-bottom: 16px;">
-                        Chưa có từ vựng
-                    </h2>
-                    <p style="color: #6b7280; margin-bottom: 32px; font-size: 18px;">
-                        Hãy thêm từ vựng trước khi làm bài tập.
-                    </p>
-                    <button onclick="location.href='themtu.html'"
-                            style="padding: 14px 28px; border-radius: 12px; border: none;
-                                   background: #7c3aed; color: white; font-weight: 600;
-                                   cursor: pointer; transition: all 0.3s; font-size: 16px;
-                                   box-shadow: 0 4px 6px rgba(124, 58, 237, 0.2);"
-                            onmouseover="this.style.background='#6d28d9';
-                                       this.style.transform='translateY(-2px)';
-                                       this.style.boxShadow='0 6px 8px rgba(124, 58, 237, 0.3)'"
-                            onmouseout="this.style.background='#7c3aed';
-                                      this.style.transform='translateY(0)';
-                                      this.style.boxShadow='0 4px 6px rgba(124, 58, 237, 0.2)'">
-                        Thêm từ vựng →
-                    </button>
-                </div>
-            `;
-        }
+        // Đóng modal khi click ngoài
+        document.addEventListener('click', function(event) {
+            const modal = document.getElementById('wordListModal');
+            if (event.target === modal) {
+                closeWordListModal();
+            }
+        });
 
         // Initialize
         loadVocabulary();

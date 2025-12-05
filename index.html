@@ -321,6 +321,28 @@
         .completion button:hover {
             background: #6d28d9;
         }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideOut {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+            to {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+        }
     </style>
 </head>
 <body>
@@ -870,26 +892,110 @@
         }
 
         function resetProgress() {
-            if (confirm('Bạn có chắc muốn xóa toàn bộ tiến độ học?')) {
-                learned = [];
-                needReview = [];
-                currentCard = 0;
-                isFlipped = false;
-                mode = 'all';
-                filterDisplayCards();
-                document.getElementById('mainView').classList.remove('hidden');
-                document.getElementById('completionView').classList.add('hidden');
-                document.getElementById('exerciseView').classList.add('hidden');
-                document.getElementById('cardFront').classList.remove('hidden');
-                document.getElementById('cardBack').classList.add('hidden');
-                
-                document.querySelectorAll('.mode-btn').forEach(btn => {
-                    btn.classList.remove('active');
-                });
-                document.querySelectorAll('.mode-btn')[0].classList.add('active');
-                
-                updateDisplay();
+            if (confirm('Bạn có chắc muốn xóa toàn bộ tiến độ học và dữ liệu từ vựng?')) {
+                try {
+                    // Reset tất cả dữ liệu
+                    vocabList = [];
+                    learned = [];
+                    needReview = [];
+                    displayCards = [];
+                    currentCard = 0;
+                    isFlipped = false;
+                    mode = 'all';
+                    
+                    // Xóa tất cả dữ liệu khỏi localStorage
+                    localStorage.removeItem('mainVocabList');
+                    localStorage.removeItem('newWords');
+                    localStorage.removeItem('vocabUpdated');
+                    
+                    // Reset giao diện
+                    updateTopicFilter();
+                    filterDisplayCards();
+                    updateDisplay();
+                    
+                    // Reset các view - kiểm tra element tồn tại
+                    const mainView = document.getElementById('mainView');
+                    const completionView = document.getElementById('completionView');
+                    const exerciseView = document.getElementById('exerciseView');
+                    const cardFront = document.getElementById('cardFront');
+                    const cardBack = document.getElementById('cardBack');
+                    
+                    if (mainView) mainView.classList.remove('hidden');
+                    if (completionView) completionView.classList.add('hidden');
+                    if (exerciseView) exerciseView.classList.add('hidden');
+                    if (cardFront) cardFront.classList.remove('hidden');
+                    if (cardBack) cardBack.classList.add('hidden');
+                    
+                    // Reset các nút mode
+                    const modeBtns = document.querySelectorAll('.mode-btn');
+                    modeBtns.forEach(btn => {
+                        btn.classList.remove('active');
+                    });
+                    if (modeBtns.length > 0) {
+                        modeBtns[0].classList.add('active');
+                    }
+                    
+                    // Reset search input
+                    const searchInput = document.getElementById('searchInput');
+                    if (searchInput) {
+                        searchInput.value = '';
+                    }
+                    
+                    // Hiển thị thông báo thành công
+                    showSuccessMessage('Đã xóa toàn bộ dữ liệu từ vựng và tiến độ học !!! (không thể khôi phục)');
+                } catch (error) {
+                    console.error('Lỗi khi xóa dữ liệu:', error);
+                    showErrorMessage('Xóa dữ liệu thất bại. Vui lòng thử lại!');
+                }
             }
+        }
+
+        function showSuccessMessage(message) {
+            const messageDiv = document.createElement('div');
+            messageDiv.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: #10b981;
+                color: white;
+                padding: 16px 24px;
+                border-radius: 8px;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+                font-weight: 500;
+                z-index: 9999;
+                animation: slideIn 0.3s ease-out;
+            `;
+            messageDiv.textContent = message;
+            document.body.appendChild(messageDiv);
+            
+            setTimeout(() => {
+                messageDiv.style.animation = 'slideOut 0.3s ease-out';
+                setTimeout(() => messageDiv.remove(), 300);
+            }, 3000);
+        }
+
+        function showErrorMessage(message) {
+            const messageDiv = document.createElement('div');
+            messageDiv.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: #ef4444;
+                color: white;
+                padding: 16px 24px;
+                border-radius: 8px;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+                font-weight: 500;
+                z-index: 9999;
+                animation: slideIn 0.3s ease-out;
+            `;
+            messageDiv.textContent = message;
+            document.body.appendChild(messageDiv);
+            
+            setTimeout(() => {
+                messageDiv.style.animation = 'slideOut 0.3s ease-out';
+                setTimeout(() => messageDiv.remove(), 300);
+            }, 3000);
         }
 
         // Phần xử lý bài tập
